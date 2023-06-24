@@ -1,7 +1,7 @@
 import isDefined from './is-defined.js'
 
 class Identity {
-  constructor (id, publicKey, idSignature, pubKeyIdSignature, type, provider) {
+  constructor(id, publicKey, idSignature, pubKeyIdSignature, type, provider) {
     if (!isDefined(id)) {
       throw new Error('Identity id is required')
     }
@@ -37,27 +37,27 @@ class Identity {
   * This is only used as a fallback to the clock id when necessary
   * @return {string} public key hex encoded
   */
-  get id () {
+  get id() {
     return this._id
   }
 
-  get publicKey () {
+  get publicKey() {
     return this._publicKey
   }
 
-  get signatures () {
+  get signatures() {
     return this._signatures
   }
 
-  get type () {
+  get type() {
     return this._type
   }
 
-  get provider () {
+  get provider() {
     return this._provider
   }
 
-  toJSON () {
+  toJSON() {
     return {
       id: this.id,
       publicKey: this.publicKey,
@@ -66,16 +66,16 @@ class Identity {
     }
   }
 
-  static isIdentity (identity) {
+  static isIdentity(identity) {
     return identity.id !== undefined &&
-           identity.publicKey !== undefined &&
-           identity.signatures !== undefined &&
-           identity.signatures.id !== undefined &&
-           identity.signatures.publicKey !== undefined &&
-           identity.type !== undefined
+      identity.publicKey !== undefined &&
+      identity.signatures !== undefined &&
+      identity.signatures.id !== undefined &&
+      identity.signatures.publicKey !== undefined &&
+      identity.type !== undefined
   }
 
-  static toJSON (identity) {
+  static toJSON(identity) {
     return {
       id: identity.id,
       publicKey: identity.publicKey,
@@ -86,3 +86,5 @@ class Identity {
 }
 
 export default Identity
+export { DIDIdentityProvider }
+
