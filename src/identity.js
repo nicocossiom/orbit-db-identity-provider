@@ -86,5 +86,4 @@ class Identity {
 }
 
 export default Identity
-export { DIDIdentityProvider }
 
