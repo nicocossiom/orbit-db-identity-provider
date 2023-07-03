@@ -5,6 +5,7 @@ import IdentityProvider from './interface.js'
 const TYPE = 'DID'
 
 export class DIDIdentityProvider extends IdentityProvider {
+  static did
   constructor({ provider: didProvider, resolver: didResolver }) {
     super()
     this.did = new DID({

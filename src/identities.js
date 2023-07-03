@@ -1,11 +1,11 @@
-import Identity from './identity.js'
-import IdentityProvider from './identity-providers/interface.js'
-import OrbitDBIdentityProvider from './identity-providers/orbitdb.js'
+import LRU from 'lru'
+import Keystore from 'orbit-db-keystore'
+import path from 'path'
 import DIDIdentityProvider from './identity-providers/did.js'
 import EthIdentityProvider from './identity-providers/ethereum.js'
-import Keystore from 'orbit-db-keystore'
-import LRU from 'lru'
-import path from 'path'
+import IdentityProvider from './identity-providers/interface.js'
+import OrbitDBIdentityProvider from './identity-providers/orbitdb.js'
+import Identity from './identity.js'
 
 const defaultType = 'orbitdb'
 const identityKeysPath = path.join('./orbitdb', 'identity', 'identitykeys')
@@ -24,19 +24,19 @@ const getHandlerFor = (type) => {
 }
 
 class Identities {
-  constructor (options) {
+  constructor(options) {
     this._keystore = options.keystore
     this._signingKeystore = options.signingKeystore || this._keystore
     this._knownIdentities = options.cache || new LRU(options.cacheSize || 100)
   }
 
-  static get IdentityProvider () { return IdentityProvider }
+  static get IdentityProvider() { return IdentityProvider }
 
-  get keystore () { return this._keystore }
+  get keystore() { return this._keystore }
 
-  get signingKeystore () { return this._signingKeystore }
+  get signingKeystore() { return this._signingKeystore }
 
-  async sign (identity, data) {
+  async sign(identity, data) {
     const signingKey = await this.keystore.getKey(identity.id)
     if (!signingKey) {
       throw new Error('Private signing key not found from Keystore')
@@ -45,11 +45,11 @@ class Identities {
     return sig
   }
 
-  async verify (signature, publicKey, data, verifier = 'v1') {
+  async verify(signature, publicKey, data, verifier = 'v1') {
     return this.keystore.verify(signature, publicKey, data, verifier)
   }
 
-  async createIdentity (options = {}) {
+  async createIdentity(options = {}) {
     const keystore = options.keystore || this.keystore
     const type = options.type || defaultType
     const identityProvider = type === defaultType ? new OrbitDBIdentityProvider(options.signingKeystore || keystore) : new (getHandlerFor(type))(options)
@@ -63,7 +63,7 @@ class Identities {
     return new Identity(id, publicKey, idSignature, pubKeyIdSignature, type, this)
   }
 
-  async signId (id) {
+  async signId(id) {
     const keystore = this.keystore
     const key = await keystore.getKey(id) || await keystore.createKey(id)
     const publicKey = keystore.getPublic(key)
@@ -71,7 +71,7 @@ class Identities {
     return { publicKey, idSignature }
   }
 
-  async verifyIdentity (identity) {
+  async verifyIdentity(identity) {
     if (!Identity.isIdentity(identity)) {
       return false
     }
@@ -79,9 +79,9 @@ class Identities {
     const knownID = this._knownIdentities.get(identity.signatures.id)
     if (knownID) {
       return identity.id === knownID.id &&
-             identity.publicKey === knownID.publicKey &&
-             identity.signatures.id === knownID.signatures.id &&
-             identity.signatures.publicKey === knownID.signatures.publicKey
+        identity.publicKey === knownID.publicKey &&
+        identity.signatures.id === knownID.signatures.id &&
+        identity.signatures.publicKey === knownID.signatures.publicKey
     }
 
     const verifyIdSig = await this.keystore.verify(
@@ -100,7 +100,7 @@ class Identities {
     return verified
   }
 
-  static async verifyIdentity (identity) {
+  static async verifyIdentity(identity) {
     if (!Identity.isIdentity(identity)) {
       return false
     }
@@ -117,7 +117,7 @@ class Identities {
     return IdentityProvider.verifyIdentity(identity)
   }
 
-  static async createIdentity (options = {}) {
+  static async createIdentity(options = {}) {
     if (!options.keystore) {
       options.keystore = new Keystore(options.identityKeysPath || identityKeysPath)
     }
@@ -135,11 +135,11 @@ class Identities {
     return identities.createIdentity(options)
   }
 
-  static isSupported (type) {
+  static isSupported(type) {
     return Object.keys(supportedTypes).includes(type)
   }
 
-  static addIdentityProvider (IdentityProvider) {
+  static addIdentityProvider(IdentityProvider) {
     if (!IdentityProvider) {
       throw new Error('IdentityProvider class needs to be given as an option')
     }
@@ -152,9 +152,11 @@ class Identities {
     supportedTypes[IdentityProvider.type] = IdentityProvider
   }
 
-  static removeIdentityProvider (type) {
+  static removeIdentityProvider(type) {
     delete supportedTypes[type]
   }
 }
 
 export default Identities
+export { DIDIdentityProvider }
+
