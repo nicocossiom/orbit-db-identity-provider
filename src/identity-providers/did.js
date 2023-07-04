@@ -12,6 +12,7 @@ export class DIDIdentityProvider extends IdentityProvider {
       resolver: didResolver,
       provider: didProvider
     })
+    DIDIdentityProvider.setDIDResolver(didResolver)
   }
 
   static get type() {
